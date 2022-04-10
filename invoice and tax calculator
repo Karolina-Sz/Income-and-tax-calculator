@@ -1,0 +1,64 @@
+# invoice calculator
+import calendar
+
+
+class Invoice:
+
+    tax_rate = 0.14
+    social_contributions = 285.71
+
+    def __init__(self, year, month, hours_worked_daily, wage, days_skipped):
+        self.year = year
+        self.month = month
+        self.hours_worked_daily = hours_worked_daily
+        self.wage = wage
+        self.days_skipped = days_skipped
+        self.calculate_tax()
+
+    def __calculate_number_of_weekend_days(self):
+        month_matrix = calendar.monthcalendar(self.year, self.month)
+        number_of_saturdays = sum(
+            1 for x in month_matrix if x[calendar.SATURDAY] != 0)
+        number_of_sundays = sum(
+            1 for x in month_matrix if x[calendar.SUNDAY] != 0)
+        return int(number_of_saturdays + number_of_sundays)
+
+    def calculate_income(self):
+        days_in_a_month = calendar.monthrange(self.year, self.month)[1]
+        days_worked = days_in_a_month - self.__calculate_number_of_weekend_days() - \
+            self.days_skipped
+        hours_all = days_worked * self.hours_worked_daily
+        self.income = hours_all * self.wage
+        return self.income
+
+    def calculate_tax(self):
+        self.income = self.calculate_income()
+        self.tax = round(
+            (self.income - self.social_contributions) * self.tax_rate)
+
+    def display(self):
+        print("Your income for " + str(self.month) + "/" +
+              str(self.year) + " is: " + str(self.income) + " zł.")
+        print("Your tax is: " + str(self.tax) + " zł.")
+
+
+def get_tax():
+    # creating an object with the class
+    year = int(input("Please input year. "))
+    month = int(input("Please input month. "))
+    hours_worked_daily = int(
+        input("How many hours daily have you worked that month? "))
+    wage = int(input("How much are you paid an hour? "))
+    days_skipped = int(input("How many working days have you skipped? "))
+
+    invoice = Invoice(year, month, hours_worked_daily, wage, days_skipped)
+    invoice.display()
+
+
+def main():
+    print("Welcome. This is a program which will help you calculate tax you owe in each month. \nIMPORTANT: Calculations are based on an assumption, that you pay 14'%' of flat tax, you have low social contribution rate, and don't work during weekends.")
+
+    get_tax()
+
+
+main()
